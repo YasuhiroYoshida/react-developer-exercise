@@ -1,78 +1,28 @@
-import React from 'react';
+import React from "react";
 import * as UI from "@material-ui/core";
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client";
+import { REGISTER_SESSION_MUTATION, UNREGISTER_SESSION_MUTATION } from "./gqls/mutations";
 import { DateTime } from "luxon";
-import { Sessions_sessions as Session } from "../types/Sessions";
-import { CurrentUser_currentUser as User } from '../types/CurrentUser';
+import { Sessions_sessions as Session } from "../../types/Sessions";
+import { CurrentUser_currentUser as User } from "../../types/CurrentUser";
 import { useAuth } from "auth";
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
-import "./session-card.scss";
-import theme from "../theme";
+import { ClassNameMap } from "@material-ui/core/styles/withStyles";
+import "./styles/session-card.scss";
+import useStyles from "./styles/session-card-custom";
+import theme from "../../theme";
 
 let session:Session;
 let attendeeCount:number;
 let user:User;
 let classes:ClassNameMap;
+let errMsgTag:HTMLElement;
 
-const useStyles = UI.makeStyles((customTheme:UI.Theme) => {
-  return UI.createStyles({
-    root: {
-      maxWidth: 345,
-      height: "100%",
-    },
-    header: {
-      height: "5em",
-    },
-    media: {
-      height: 0,
-      paddingTop: '56.25%', // 16:9
-    },
-    registerBtn: {
-      margin: customTheme.spacing(1),
-      display: 'inline-block',
-      paddingLeft: customTheme.spacing(3),
-      paddingRight: customTheme.spacing(3),
-
-    },
-    unregisterBtn: {
-      margin: customTheme.spacing(1),
-    },
-    buttonGroup: {
-      justifyContent: 'center',
-    }
-  });
-});
-
-const REGISTER_SESSION_MUTATION = gql`
-  mutation Register($sessionId:ID!) {
-    register(sessionId:$sessionId) {
-      session {
-        id
-        title
-        strapline
-        image
-        startTime
-        signups {
-          user: id
-          name
-          avatar
-        }
-      }
-    }
-  }
-`;
-
-const UNREGISTER_SESSION_MUTATION = gql`
-  mutation Unregister($sessionId:ID!) {
-    unregister(sessionId:$sessionId)
-  }
-`;
 
 const startTime = (datetime:string):string => {
-  return DateTime.fromISO(datetime).toFormat("DDDD, t")
+  return DateTime.fromISO(datetime).toFormat("DDDD, t");
 };
 
-const attendeeCountAsMsg = (attendeeCount:number):string => {
+const attendeeCountLabel = ():string => {
   if (attendeeCount <= 0) return `Be the first to join!`;
   if (attendeeCount === 1) return `${attendeeCount} person attending!`;
   return `${attendeeCount} people attending!`;
@@ -85,12 +35,12 @@ const updateSignups = (cache:any) => {
   attendeeCount = newSignups.length;
 }
 
-const replaceAttendeeCountAsMsg = () =>  {
-  document.querySelector(`#attendeeCount${session.id}`)!.textContent = attendeeCountAsMsg(attendeeCount);
+const UpdateAttendeeCountLabel = () =>  {
+  document.querySelector(`#attendeeCount${session.id}`)!.textContent = attendeeCountLabel();
 }
 
-const removeErrMsg = () => {
-  document.querySelector(`#errMsg${session.id}`)!.textContent = "";
+const updateErrMsg = (msg:string) => {
+  if (errMsgTag) errMsgTag.textContent = msg;
 }
 
 const SessionCard = ({currentSession}:{currentSession:Session}) => {
@@ -98,13 +48,14 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
   attendeeCount = session.signups.length;
   user = useAuth().user;
   classes = useStyles(theme);
+  errMsgTag = document.querySelector(`#errMsg${session.id}`)!;
 
   const isAttending = (session.signups.some(signup => signup.user === user.id)) ? true : false;
   const [registerDisabled, setRegisterDisabled] = React.useState(isAttending);
   const [register, { error: registerError }] = useMutation(REGISTER_SESSION_MUTATION, {
           variables: { sessionId: session.id },
           update(_) {
-            replaceAttendeeCountAsMsg();
+            UpdateAttendeeCountLabel();
           }
         });
   const [unregisterDisabled, setUnregisterDisabled] = React.useState(!registerDisabled);
@@ -112,20 +63,17 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
           variables: { sessionId: session.id },
           update(cache) {
             updateSignups(cache);
-            replaceAttendeeCountAsMsg();
+            UpdateAttendeeCountLabel();
           }
         });
 
-  const errMsgTag = document.querySelector(`#errMsg${session.id}`);
-  if (errMsgTag) {
-    if (registerError) {
-      errMsgTag.textContent = registerError.message;
-      return null;
-    }
-    if (unregisterError) {
-    errMsgTag.textContent = unregisterError.message;
+  if (registerError) {
+    updateErrMsg(registerError.message);
     return null;
-    }
+  }
+  if (unregisterError) {
+    updateErrMsg(unregisterError.message);
+    return null;
   }
 
   return (
@@ -145,7 +93,7 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
             { startTime(session.startTime) }
           </UI.Typography>
           <UI.Typography variant="body1" color="textSecondary" align="center" gutterBottom component="p" id={`attendeeCount${session.id}`}>
-            { attendeeCountAsMsg(attendeeCount) }
+            { attendeeCountLabel() }
           </UI.Typography>
           <UI.Typography className="errMsg" variant="body2" color="primary" align="center" gutterBottom component="p" id={`errMsg${session.id}`}>
           </UI.Typography>
@@ -162,7 +110,7 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
               e.preventDefault();
               setRegisterDisabled(true);
               setUnregisterDisabled(false);
-              removeErrMsg();
+              updateErrMsg("");
               register();
             }}
           >
@@ -180,7 +128,7 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
               e.preventDefault();
               setRegisterDisabled(false);
               setUnregisterDisabled(true);
-              removeErrMsg();
+              updateErrMsg("");
               unregister();
             }}
           >
