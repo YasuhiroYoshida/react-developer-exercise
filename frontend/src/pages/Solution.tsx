@@ -1,6 +1,5 @@
 import React from "react";
 import * as UI from "@material-ui/core";
-import gql from "graphql-tag";
 import { useQuery } from "@apollo/client";
 import LuxonUtils from "@date-io/luxon";
 import { DateTime } from "luxon";
@@ -9,58 +8,8 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { Sessions_sessions as Session } from "../types/Sessions"
-import SessionCard from "components/session-card";
-import theme from "../theme";
-
-const useStyles = UI.makeStyles((customTheme: UI.Theme) => {
-  return UI.createStyles({
-    root: {
-      maxWidth: 345,
-    },
-    media: {
-      height: 0,
-      paddingTop: '56.25%', // 16:9
-    },
-    registerButton: {
-      margin: customTheme.spacing(1),
-      display: 'inline-block',
-      paddingLeft: customTheme.spacing(3),
-      paddingRight: customTheme.spacing(3),
-
-    },
-    unregisterButton: {
-      margin: customTheme.spacing(1),
-    },
-    buttonGroup: {
-      justifyContent: 'center',
-    },
-    box: {
-    },
-    inputField: {
-    },
-    item: {
-    },
-    datepicker: {
-    }
-  });
-});
-
-const SESSIONS_QUERY = gql`
-  query Sessions {
-    sessions {
-      id
-      title
-      strapline
-      image
-      startTime
-      signups {
-        user: id
-        name
-        avatar
-      }
-    }
-  }
-`;
+import SessionCard from "components/SessionCard/session-card";
+import { SESSIONS_QUERY } from "./gqls/queries";
 
 const QuerySession = (searchWord:string, startDate:DateTime|null, endDate:DateTime|null, sessions:Session[]) => {
   return sessions.filter((session:Session) => {
@@ -84,26 +33,24 @@ const Solution = () => {
   const [searchWord, setSearchWord] = React.useState("");
   const [startDate, setStartDate] = React.useState<DateTime | null>(null);
   const [endDate, setEndDate] = React.useState<DateTime | null>(null);
-  const classes = useStyles(theme);
   const { loading, error, data } = useQuery<{sessions:Session[]}>(SESSIONS_QUERY);
 
   if (loading) {
-    return (<p>Loading ...</p>);
+    return (<p>Loading...</p>);
   } else if(error) {
     return (<p>`Error! ${error.message}`</p>);
   }
 
   return (
-    <>
-      <UI.Box m={4} className={classes.box}>
+    <React.Fragment>
+      <UI.Box>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
           <UI.Grid container alignContent="space-around" spacing={4}>
-            <UI.Grid item xs={12} sm={6} md={4} className={classes.item}>
+            <UI.Grid item xs={12} sm={6} md={4}>
               <UI.TextField
-                id="standard-basic"
+                id="search-by-word"
                 label="Search for events"
                 placeholder="Search for events..."
-                className={classes.inputField}
                 margin="normal"
                 fullWidth
                 onChange={(e) => (setSearchWord(e.target.value))}
@@ -111,7 +58,7 @@ const Solution = () => {
             </UI.Grid>
               <UI.Grid item xs={12} sm={6} md={4}>
                 <KeyboardDatePicker
-                  id="start-date-picker-dialog"
+                  id="search-by-start-date"
                   label="Start date dd.MM.yyyy"
                   value={startDate}
                   format="dd.MM.yyyy"
@@ -125,7 +72,7 @@ const Solution = () => {
             </UI.Grid>
             <UI.Grid item xs={12} sm={6} md={4}>
                 <KeyboardDatePicker
-                  id="end-date-picker-dialog"
+                  id="search-by-start-end"
                   label="End date dd.MM.yyyy"
                   value={endDate}
                   format="dd.MM.yyyy"
@@ -140,12 +87,12 @@ const Solution = () => {
           </UI.Grid>
         </MuiPickersUtilsProvider>
       </UI.Box>
-      <UI.Box m={4}>
+      <UI.Box>
         <UI.Grid container direction="row" alignContent="space-around" spacing={4}>
           { QuerySession(searchWord, startDate!, endDate!, data!.sessions) }
         </UI.Grid>
       </UI.Box>
-    </>
+    </React.Fragment>
   );
 };
 
