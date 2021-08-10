@@ -1,0 +1,11 @@
+@use "@material/card";
+
+@include card.core-styles;
+
+.MuiCardHeader-content {
+  align-self: flex-start;
+}
+
+.MuiCardContent-root .errMsg {
+  height: 1em;
+}

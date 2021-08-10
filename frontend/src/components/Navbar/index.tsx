@@ -1,8 +1,8 @@
 import React from "react";
 import * as UI from "@material-ui/core";
-import "./styles.scss";
-import logo from "logo.svg";
 import { useAuth } from "auth";
+import logo from "logo.svg";
+import "./index.scss";
 
 const Navbar = () => {
   const { user } = useAuth();

@@ -4,8 +4,11 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.3.11",
+    "@date-io/luxon": "1.x",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/pickers": "^3.3.10",
+    "@material/card": "^12.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -16,12 +19,13 @@
     "@types/react-router-dom": "^5.1.7",
     "graphql": "^15.5.0",
     "graphql.macro": "^1.4.2",
-    "node-sass": "^6.0.1",
+    "luxon": "^2.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
-    "typescript": "^4.1.2",
+    "sass": "^1.37.5",
+    "typescript": "^4.3.5",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -29,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "graphql:generate": "rm -rf src/types/* && apollo client:codegen --endpoint http://localhost:4000/graphql --globalTypesFile=src/types/global.d.ts --tsFileExtension=d.ts --target typescript --outputFlat src/types"
+    "graphql:generate": "rm -rf src/types/* && apollo client:codegen --endpoint http://localhost:3000/graphql --globalTypesFile=src/types/global.d.ts --tsFileExtension=d.ts --target typescript --outputFlat src/types"
   },
   "eslintConfig": {
     "extends": [
@@ -51,6 +55,7 @@
   },
   "proxy": "http://localhost:3001",
   "devDependencies": {
+    "@types/luxon": "^1.27.1",
     "apollo": "^2.32.5"
   }
 }
