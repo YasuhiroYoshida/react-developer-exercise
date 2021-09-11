@@ -1,3 +1,11 @@
+A while ago, I was contacted by this company called GoodGym.
+The company was looking for a React developer, found me on the internet, and thought I could be a good fit.
+It gave me the coding task below to see my skills and experiences in the technology.
+&nbsp;
+Although I finished it, the opportunity was gone before I knew. And my work did not get to see the light of day.
+But here it is, if anyone is interested in how it went. Run `yarn start`. That's all it takes. I added a little improvement later on in September 2021.
+&nbsp;
+&nbsp;
 # GoodGym React Developer Exercise
 
 Thank you for applying for the role of Senior React Developer at GoodGym. This repository contains a coding exercise, your solution to which will form the basis for part of the technical interview.
