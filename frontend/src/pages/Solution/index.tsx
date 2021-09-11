@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, Fragment } from "react";
 import * as UI from "@material-ui/core";
 import { useQuery } from "@apollo/client";
 import LuxonUtils from "@date-io/luxon";
@@ -11,7 +11,7 @@ import { Sessions_sessions as Session } from "../../types/Sessions"
 import SessionCard from "pages/Solution/SessionCard";
 import { SESSIONS_QUERY } from "../graphql/queries";
 
-const QuerySession = (searchWord:string, startDate:DateTime|null, endDate:DateTime|null, sessions:Session[]) => {
+const sessionCards = (searchWord:string, startDate:DateTime|null, endDate:DateTime|null, sessions:Session[]) => {
   return sessions.filter((session:Session) => {
     const wordMatched = (!searchWord) ? true :
       (
@@ -22,7 +22,8 @@ const QuerySession = (searchWord:string, startDate:DateTime|null, endDate:DateTi
     const startDateMatched = (!startDate) ? true : (startDate.startOf("day") <= startTime)
     const endDateMatched = (!endDate) ? true : (startTime <= endDate.endOf("day"))
     return wordMatched && startDateMatched && endDateMatched;
-  }).map((session:Session) => {
+  })
+  .map((session:Session) => {
     return (
       <SessionCard key={session.id} currentSession={session} />
     );
@@ -30,9 +31,9 @@ const QuerySession = (searchWord:string, startDate:DateTime|null, endDate:DateTi
 }
 
 const Solution = () => {
-  const [searchWord, setSearchWord] = React.useState("");
-  const [startDate, setStartDate] = React.useState<DateTime | null>(null);
-  const [endDate, setEndDate] = React.useState<DateTime | null>(null);
+  const [searchWord, setSearchWord] = useState<string>("");
+  const [startDate, setStartDate] = useState<DateTime | null>(null);
+  const [endDate, setEndDate] = useState<DateTime | null>(null);
   const { loading, error, data } = useQuery<{sessions:Session[]}>(SESSIONS_QUERY);
 
   if (loading) {
@@ -42,7 +43,7 @@ const Solution = () => {
   }
 
   return (
-    <React.Fragment>
+    <Fragment>
       <UI.Box>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
           <UI.Grid container alignContent="space-around" spacing={4}>
@@ -89,10 +90,10 @@ const Solution = () => {
       </UI.Box>
       <UI.Box>
         <UI.Grid container direction="row" alignContent="space-around" spacing={4}>
-          { QuerySession(searchWord, startDate!, endDate!, data!.sessions) }
+          { sessionCards(searchWord, startDate!, endDate!, data!.sessions) }
         </UI.Grid>
       </UI.Box>
-    </React.Fragment>
+    </Fragment>
   );
 };
 
