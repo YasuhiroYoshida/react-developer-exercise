@@ -7,9 +7,9 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import { Sessions_sessions as Session } from "../types/Sessions"
-import SessionCard from "components/SessionCard/session-card";
-import { SESSIONS_QUERY } from "./gqls/queries";
+import { Sessions_sessions as Session } from "../../types/Sessions"
+import SessionCard from "pages/Solution/SessionCard";
+import { SESSIONS_QUERY } from "../graphql/queries";
 
 const QuerySession = (searchWord:string, startDate:DateTime|null, endDate:DateTime|null, sessions:Session[]) => {
   return sessions.filter((session:Session) => {

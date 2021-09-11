@@ -1,6 +1,6 @@
 import React from "react";
 import * as UI from "@material-ui/core";
-import { useAuth } from "auth";
+import { useAuth } from "../../common/auth";
 
 const Readme = () => {
   const { user } = useAuth();

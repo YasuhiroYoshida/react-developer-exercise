@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const REGISTER_SESSION_MUTATION = gql`
+const REGISTER_SESSION_MUTATION = gql`
   mutation Register($sessionId:ID!) {
     register(sessionId:$sessionId) {
       session {
@@ -19,8 +19,10 @@ export const REGISTER_SESSION_MUTATION = gql`
   }
 `;
 
-export const UNREGISTER_SESSION_MUTATION = gql`
+const UNREGISTER_SESSION_MUTATION = gql`
   mutation Unregister($sessionId:ID!) {
     unregister(sessionId:$sessionId)
   }
 `;
+
+export { REGISTER_SESSION_MUTATION, UNREGISTER_SESSION_MUTATION };

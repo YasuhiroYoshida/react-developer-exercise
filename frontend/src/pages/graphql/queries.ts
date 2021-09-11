@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const SESSIONS_QUERY = gql`
+const SESSIONS_QUERY = gql`
   query Sessions {
     sessions {
       id
@@ -16,3 +16,5 @@ export const SESSIONS_QUERY = gql`
     }
   }
 `;
+
+export { SESSIONS_QUERY };

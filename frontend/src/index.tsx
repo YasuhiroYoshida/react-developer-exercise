@@ -1,18 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-
 import { ApolloProvider } from "@apollo/client";
-import * as graphql from "./graphql";
+import client from "./common/apolloClientInstance";
 import { ThemeProvider } from "@material-ui/core";
-import theme from "./theme";
+import theme from "./common/theme";
+import "./index.scss";
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <ApolloProvider client={graphql.client}>
+      <ApolloProvider client={client}>
         <App />
       </ApolloProvider>
     </ThemeProvider>

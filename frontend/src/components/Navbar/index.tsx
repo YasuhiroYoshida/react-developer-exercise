@@ -1,7 +1,7 @@
 import React from "react";
 import * as UI from "@material-ui/core";
-import { useAuth } from "auth";
-import logo from "logo.svg";
+import { useAuth } from "../../common/auth";
+import logo from "./styles/logo.svg";
 import "./styles/index.scss";
 
 const Navbar = () => {

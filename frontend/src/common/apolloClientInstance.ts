@@ -4,8 +4,10 @@ const http = createHttpLink({
   uri: "/graphql",
 });
 
-export const client = new ApolloClient({
+const client = new ApolloClient({
   link: http,
   cache: new InMemoryCache(),
   credentials: "same-origin",
 });
+
+export default client;

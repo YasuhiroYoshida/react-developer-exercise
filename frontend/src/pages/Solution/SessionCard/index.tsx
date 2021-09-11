@@ -1,15 +1,15 @@
 import React from "react";
 import * as UI from "@material-ui/core";
 import { useMutation } from "@apollo/client";
-import { REGISTER_SESSION_MUTATION, UNREGISTER_SESSION_MUTATION } from "./gqls/mutations";
+import { REGISTER_SESSION_MUTATION, UNREGISTER_SESSION_MUTATION } from "./graphql/mutations";
 import { DateTime } from "luxon";
-import { Sessions_sessions as Session } from "../../types/Sessions";
-import { CurrentUser_currentUser as User } from "../../types/CurrentUser";
-import { useAuth } from "auth";
+import { Sessions_sessions as Session } from "../../../types/Sessions";
+import { CurrentUser_currentUser as User } from "../../../types/CurrentUser";
+import { useAuth } from "../../../common/auth";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 import "./styles/session-card.scss";
 import useStyles from "./styles/session-card-custom";
-import theme from "../../theme";
+import theme from "../../../common/theme";
 
 let session:Session;
 let attendeeCount:number;

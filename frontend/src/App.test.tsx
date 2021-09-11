@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { ApolloProvider } from "@apollo/client";
-import * as graphql from "./graphql";
+import client from "./common/apolloClientInstance";
 import App from "./App";
 
 test("renders the page title common across pages", () => {
   render(
-    <ApolloProvider client={graphql.client}>
+    <ApolloProvider client={client}>
       <App />
     </ApolloProvider>
   );
