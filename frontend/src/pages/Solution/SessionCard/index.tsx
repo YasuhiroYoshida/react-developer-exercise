@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import * as UI from "@material-ui/core";
 import { useMutation } from "@apollo/client";
 import { REGISTER_SESSION_MUTATION, UNREGISTER_SESSION_MUTATION } from "./graphql/mutations";
@@ -11,70 +11,42 @@ import "./styles/session-card.scss";
 import useStyles from "./styles/session-card-custom";
 import theme from "../../../common/theme";
 
-let session:Session;
-let attendeeCount:number;
-let user:User;
-let classes:ClassNameMap;
-let errMsgTag:HTMLElement;
-
-
-const startTime = (datetime:string):string => {
-  return DateTime.fromISO(datetime).toFormat("DDDD, t");
-};
-
-const attendeeCountLabel = ():string => {
-  if (attendeeCount <= 0) return `Be the first to join!`;
-  if (attendeeCount === 1) return `${attendeeCount} person attending!`;
-  return `${attendeeCount} people attending!`;
-}
-
-const updateSignups = (cache:any) => {
-  const newSignups = cache.data.data[`Session:${session.id}`].signups.filter((signup:User) => signup.id !== user.id)
-  cache.data.data[`Session:${session.id}`].signups = newSignups;
-
-  attendeeCount = newSignups.length;
-}
-
-const UpdateAttendeeCountLabel = () =>  {
-  document.querySelector(`#attendeeCount${session.id}`)!.textContent = attendeeCountLabel();
-}
-
-const updateErrMsg = (msg:string) => {
-  if (errMsgTag) errMsgTag.textContent = msg;
-}
-
 const SessionCard = ({currentSession}:{currentSession:Session}) => {
-  session = currentSession;
-  attendeeCount = session.signups.length;
-  user = useAuth().user;
-  classes = useStyles(theme);
-  errMsgTag = document.querySelector(`#errMsg${session.id}`)!;
+  const session = currentSession;
+  const user:User = useAuth().user;
+  const classes:ClassNameMap = useStyles(theme);
 
-  const isAttending = (session.signups.some(signup => signup.user === user.id)) ? true : false;
-  const [registerDisabled, setRegisterDisabled] = React.useState(isAttending);
+  const [attendeeCount, setAttendeeCount] = useState(session.signups.length);
+  const [attendeeCountLabel, setAttendeeCountLabel] = useState('')
+  useEffect(()=>{
+    let label = `${attendeeCount} people attending!`;
+    if (attendeeCount === 1) label = `${attendeeCount} person attending!`;
+    if (attendeeCount <= 0) label = `Be the first to join!`;
+    setAttendeeCountLabel(label)
+  }, [attendeeCount])
+
+  const [registerDisabled, setRegisterDisabled] = useState(session.signups.some(signup => (signup.user === user.id)));
   const [register, { error: registerError }] = useMutation(REGISTER_SESSION_MUTATION, {
           variables: { sessionId: session.id },
-          update(_) {
-            UpdateAttendeeCountLabel();
-          }
+          update: (_) => {
+            setAttendeeCount(session.signups.length);
+          },
+          onError: ((err) => console.error(err))
         });
-  const [unregisterDisabled, setUnregisterDisabled] = React.useState(!registerDisabled);
+  const [unregisterDisabled, setUnregisterDisabled] = useState(!registerDisabled);
   const [unregister, { error: unregisterError }] = useMutation(UNREGISTER_SESSION_MUTATION, {
           variables: { sessionId: session.id },
-          update(cache) {
-            updateSignups(cache);
-            UpdateAttendeeCountLabel();
-          }
+          update: (cache:any) => {
+            // Backend won't return a whole set of data, and therefore Apollo won't update everything.
+            // Signups have to be manually updated here.
+            const newSignups = cache.data.data[`Session:${session.id}`].signups.filter((signup:User) => signup.id !== user.id)
+            cache.data.data[`Session:${session.id}`].signups = newSignups;
+            setAttendeeCount(newSignups.length);
+          },
+          onError: ((err) => console.error(err))
         });
-
-  if (registerError) {
-    updateErrMsg(registerError.message);
-    return null;
-  }
-  if (unregisterError) {
-    updateErrMsg(unregisterError.message);
-    return null;
-  }
+  if (registerError) return null;
+  if (unregisterError) return null;
 
   return (
     <UI.Grid item xs={12} sm={6} md={4}>
@@ -90,10 +62,10 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
         />
         <UI.CardContent>
           <UI.Typography variant="h6" color="textSecondary" align="center" gutterBottom component="p">
-            { startTime(session.startTime) }
+            { DateTime.fromISO(session.startTime).toFormat("DDDD, t") }
           </UI.Typography>
           <UI.Typography variant="body1" color="textSecondary" align="center" gutterBottom component="p" id={`attendeeCount${session.id}`}>
-            { attendeeCountLabel() }
+            { attendeeCountLabel }
           </UI.Typography>
           <UI.Typography className="errMsg" variant="body2" color="primary" align="center" gutterBottom component="p" id={`errMsg${session.id}`}>
           </UI.Typography>
@@ -110,7 +82,6 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
               e.preventDefault();
               setRegisterDisabled(true);
               setUnregisterDisabled(false);
-              updateErrMsg("");
               register();
             }}
           >
@@ -128,7 +99,6 @@ const SessionCard = ({currentSession}:{currentSession:Session}) => {
               e.preventDefault();
               setRegisterDisabled(false);
               setUnregisterDisabled(true);
-              updateErrMsg("");
               unregister();
             }}
           >
