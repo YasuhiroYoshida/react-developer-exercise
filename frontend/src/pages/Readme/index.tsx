@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import * as UI from "@material-ui/core";
 import { useAuth } from "../../common/auth";
 
@@ -6,7 +6,7 @@ const Readme = () => {
   const { user } = useAuth();
   if (!user) return null;
   return (
-    <React.Fragment>
+    <Fragment>
       <UI.Box>
         <UI.Typography>
           This project skeleton includes a{" "}
@@ -74,7 +74,7 @@ const Readme = () => {
           `frontend` folder.
         </li>
       </ul>
-    </React.Fragment>
+    </Fragment>
   );
 };
 
